@@ -3,7 +3,7 @@ import joblib
 import numpy as np
 
 # Load the saved model
-model = joblib.load('saved_model.pkl')
+model = joblib.load('model_predictions.pkl')
 
 # Title for the web app
 st.title("Business Analytics Predictive Model")
@@ -20,12 +20,11 @@ campaign = st.sidebar.number_input("Number of Contacts", step=1, value=1)
 pdays = st.sidebar.number_input("Days Passed Since Last Campaign (-1 if not applicable)", step=1, value=-1)
 previous = st.sidebar.number_input("Number of Previous Contacts", step=1, value=0)
 
-# Job types
+# Job types (make sure to adjust based on the model's training data)
 job_blue_collar = st.sidebar.checkbox("Blue-collar Job", False)
 job_entrepreneur = st.sidebar.checkbox("Entrepreneur", False)
 job_housemaid = st.sidebar.checkbox("Housemaid", False)
 job_management = st.sidebar.checkbox("Management", False)
-# (Add other job types as checkboxes if necessary)
 
 # Marital Status
 marital_married = st.sidebar.checkbox("Married", False)
@@ -47,10 +46,10 @@ contact_unknown = st.sidebar.checkbox("Contact Unknown", False)
 # Month of Contact (use dropdowns for month selection)
 month = st.sidebar.selectbox("Month of Contact", ["May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"])
 
-# Outcome
+# Previous outcome
 poutcome_success = st.sidebar.checkbox("Previous Outcome Success", False)
 
-# Define the feature vector for prediction
+# Define the feature vector for prediction (ensure this matches the model's input)
 input_data = np.array([[age, balance, day, duration, campaign, pdays, previous, 
                         job_blue_collar, job_entrepreneur, job_housemaid, job_management, 
                         marital_married, marital_single, education_secondary, education_tertiary, 
@@ -60,11 +59,14 @@ input_data = np.array([[age, balance, day, duration, campaign, pdays, previous,
 
 # Button to make predictions
 if st.sidebar.button("Predict"):
-    # Perform prediction using the loaded model
-    prediction = model.predict(input_data)
-    
-    # Display result
-    if prediction[0] == "yes":
-        st.success("The model predicts a positive outcome!")
-    else:
-        st.warning("The model predicts a negative outcome.")
+    try:
+        # Perform prediction using the loaded model
+        prediction = model.predict(input_data)
+        
+        # Display result
+        if prediction[0] == "yes":
+            st.success("The model predicts a positive outcome!")
+        else:
+            st.warning("The model predicts a negative outcome.")
+    except Exception as e:
+        st.error(f"An error occurred during prediction: {e}")
